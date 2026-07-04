@@ -1,0 +1,24 @@
+{
+  "name": "geo-pulse-media-os",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "node server/mock-api.mjs",
+    "reset:api-state": "node server/reset-state.mjs",
+    "test": "node --test tests/server/domain.test.mjs tests/server/errors.test.mjs tests/server/router.test.mjs tests/server/state-store.test.mjs tests/src/generation-utils.test.mjs tests/src/workflow-actions.test.mjs tests/src/workspace-state.test.mjs tests/src/workspace-utils.test.mjs tests/src/jobs-utils.test.mjs && node --import tsx --test tests/ui/task-board.test.jsx tests/ui/section-loading.test.jsx tests/ui/workspace-controller.test.jsx tests/ui/app-workflow.test.jsx",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "jsdom": "^29.0.2",
+    "tsx": "^4.21.0",
+    "vite": "^7.0.0"
+  }
+}

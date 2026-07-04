@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-17T01:10:00.000Z",
+  "scenarioTopics": {
+    "consumer-tech": [
+      {
+        "id": "t1",
+        "source": "小红书热榜",
+        "heat": "热度 92",
+        "title": "AI 硬件是不是新一轮内容创业的流量入口？",
+        "summary": "搜索热度持续攀升，用户在找真实体验、购买建议和生产力落地场景的组合内容。",
+        "angle": "机会点: 测评 + 场景清单",
+        "tags": [
+          "高商业相关",
+          "中竞争密度"
+        ]
+      },
+      {
+        "id": "t2",
+        "source": "知乎趋势",
+        "heat": "热度 88",
+        "title": "2026 年个人品牌还需要做公众号吗？",
+        "summary": "讨论集中在私域沉淀和平台依赖风险，适合输出专业分析长文再拆短内容。",
+        "angle": "机会点: 观点型长文",
+        "tags": [
+          "高检索意图",
+          "长尾可复投"
+        ]
+      },
+      {
+        "id": "t3",
+        "source": "Reddit /r/Entrepreneur",
+        "heat": "热度 79",
+        "title": "Solo creator 如何用 AI 建立自动增长系统",
+        "summary": "海外创作者在讨论内容自动化、获客漏斗和数据闭环，适合本地化方法论输出。",
+        "angle": "机会点: 方法论搬运升级",
+        "tags": [
+          "海外灵感",
+          "可系列化"
+        ]
+      },
+      {
+        "id": "t4",
+        "source": "B 站热视频",
+        "heat": "热度 84",
+        "title": "低成本搭建个人工作室的设备清单",
+        "summary": "视频互动高，评论区追问设备型号和预算配置，适合图文清单和短视频口播联动。",
+        "angle": "机会点: 清单型转化内容",
+        "tags": [
+          "清单模板",
+          "适合带货"
+        ]
+      }
+    ],
+    "beauty": [
+      {
+        "id": "b1",
+        "source": "小红书热榜",
+        "heat": "热度 91",
+        "title": "敏感肌春夏换季维稳怎么选？",
+        "summary": "用户对成分安全、肤感和真实修护周期最敏感，适合做分肤质方案。",
+        "angle": "机会点: 维稳清单 + 对比图",
+        "tags": [
+          "高互动",
+          "高收藏"
+        ]
+      },
+      {
+        "id": "b2",
+        "source": "抖音热点",
+        "heat": "热度 85",
+        "title": "百元精华能不能替代大牌？",
+        "summary": "对比类内容讨论度高，适合快节奏视频脚本和评论区引导。",
+        "angle": "机会点: 平替测评",
+        "tags": [
+          "强争议",
+          "适合直播引流"
+        ]
+      },
+      {
+        "id": "b3",
+        "source": "知乎趋势",
+        "heat": "热度 77",
+        "title": "成分党到底该怎么看功效报告？",
+        "summary": "适合做专业解释型内容，为高客单产品建立信任基础。",
+        "angle": "机会点: 知识型长文",
+        "tags": [
+          "强专业度",
+          "可做系列"
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "e1",
+        "source": "知乎热榜",
+        "heat": "热度 89",
+        "title": "普通人转行 AI 产品经理该怎么准备？",
+        "summary": "兼具求职焦虑和明确搜索需求，适合做路线图型内容。",
+        "angle": "机会点: 路径拆解",
+        "tags": [
+          "高检索",
+          "可转课程"
+        ]
+      },
+      {
+        "id": "e2",
+        "source": "小红书热榜",
+        "heat": "热度 82",
+        "title": "考研复习计划到底怎么做才不崩？",
+        "summary": "适合输出时间表模板、打卡机制和真实案例拆解。",
+        "angle": "机会点: 模板型内容",
+        "tags": [
+          "高收藏",
+          "强复购潜力"
+        ]
+      },
+      {
+        "id": "e3",
+        "source": "B 站评论区",
+        "heat": "热度 75",
+        "title": "英语口语自学有没有低成本路径？",
+        "summary": "适合做方法清单、练习素材包和打卡营承接。",
+        "angle": "机会点: 自学路线图",
+        "tags": [
+          "低门槛",
+          "适合私域"
+        ]
+      }
+    ]
+  },
+  "jobs": {
+    "topicIngestion": [
+      {
+        "id": "seed-ingestion-01",
+        "scenarioKey": "consumer-tech",
+        "kind": "topic_ingestion",
+        "status": "completed",
+        "reviewStatus": "not_required",
+        "label": "热点池初始采集",
+        "detail": "聚合小红书、知乎、Reddit、B 站与 YouTube 热点。",
+        "createdAt": "2026-04-17T00:30:00.000Z",
+        "completedAt": "2026-04-17T00:35:00.000Z",
+        "payload": {
+          "refreshedTopics": 4
+        },
+        "resultSummary": "初始化热点池已就绪。",
+        "notes": [
+          {
+            "id": "seed-note-ingestion-01",
+            "text": "系统已完成首轮热点采集。",
+            "author": "system",
+            "createdAt": "2026-04-17T00:35:00.000Z"
+          }
+        ],
+        "history": [
+          {
+            "id": "seed-history-ingestion-01",
+            "action": "created",
+            "note": "任务已初始化",
+            "actor": "system",
+            "createdAt": "2026-04-17T00:30:00.000Z"
+          }
+        ]
+      }
+    ],
+    "generation": [
+      {
+        "id": "seed-generation-01",
+        "scenarioKey": "consumer-tech",
+        "kind": "generation",
+        "status": "completed",
+        "reviewStatus": "pending_review",
+        "label": "图文初版生成",
+        "detail": "小红书种草风 + 图文封面 + 正文排版",
+        "createdAt": "2026-04-17T00:50:00.000Z",
+        "completedAt": "2026-04-17T00:55:00.000Z",
+        "payload": {
+          "tone": "小红书种草风",
+          "assetMode": "图文封面 + 正文排版",
+          "topicTitle": "AI 硬件是不是新一轮内容创业的流量入口？",
+          "fullDraft": "标题：\nAI 硬件是不是新一轮内容创业的流量入口？\n\n正文：\n最近讨论「AI 硬件是不是新一轮内容创业的流量入口？」的人，真正会留下来的原因不是概念有多新，而是它是否回答了 内容创业者和个人工作室 最在意的问题。\n1. 先把 搜索热度持续攀升，用户在找真实体验、购买建议和生产力落地场景的组合内容。 讲清楚，别让读者自己猜重点。\n2. 围绕「测评 + 场景清单」给出更具体的判断，这会比空泛观点更容易转化。\n3. 生成时同步准备 图文封面 + 正文排版，方便后续一稿多端复用。\n\n结尾 CTA：\n如果你想把这类题继续拆成 评测图文、长文拆解和 30 秒脚本，评论区留“工作流”。"
+        },
+        "resultSummary": "种草稿件已生成，待审核。",
+        "notes": [],
+        "history": [
+          {
+            "id": "seed-history-generation-01",
+            "action": "created",
+            "note": "已生成第一版草稿",
+            "actor": "system",
+            "createdAt": "2026-04-17T00:50:00.000Z"
+          }
+        ],
+        "reviewComment": ""
+      }
+    ],
+    "distribution": [
+      {
+        "id": "seed-distribution-01",
+        "scenarioKey": "consumer-tech",
+        "kind": "distribution",
+        "status": "queued",
+        "reviewStatus": "pending_review",
+        "label": "首轮矩阵分发",
+        "detail": "已排队 4 个渠道任务",
+        "createdAt": "2026-04-17T01:10:00.000Z",
+        "payload": {
+          "channels": 4,
+          "scenarioName": "消费科技",
+          "schedules": [
+            {
+              "name": "小红书 @极脉实验室",
+              "schedule": "14:30 发布",
+              "asset": "图文种草 + 封面图"
+            },
+            {
+              "name": "知乎 @极脉智媒",
+              "schedule": "16:00 发布",
+              "asset": "长文评测"
+            },
+            {
+              "name": "抖音 @极脉工作流",
+              "schedule": "20:15 发布",
+              "asset": "30 秒视频脚本"
+            },
+            {
+              "name": "CSDN @GEO-Pulse",
+              "schedule": "21:00 发布",
+              "asset": "工具实践文章"
+            }
+          ]
+        },
+        "resultSummary": "等待审核通过后开始发布。",
+        "notes": [],
+        "history": [
+          {
+            "id": "seed-history-distribution-01",
+            "action": "created",
+            "note": "发布任务已进入待审核状态",
+            "actor": "system",
+            "createdAt": "2026-04-17T01:10:00.000Z"
+          }
+        ],
+        "reviewComment": ""
+      }
+    ]
+  }
+}

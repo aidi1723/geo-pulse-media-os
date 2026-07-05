@@ -58,3 +58,83 @@ test("withRequestLogging logs method, path, status, and duration without body", 
   assert.doesNotMatch(logs[0], /token/);
   assert.doesNotMatch(logs[0], /secret/);
 });
+
+test("withRequestLogging ignores logger failures after successful handler calls", async () => {
+  const handler = withRequestLogging(
+    async (request, response) => {
+      sendJson(response, 204, { ok: true });
+    },
+    {
+      logger: {
+        info: () => {
+          throw new Error("logger unavailable");
+        },
+      },
+    },
+  );
+
+  await assert.doesNotReject(handler(createRequest(), createResponse()));
+});
+
+test("withRequestLogging preserves handler failures when logger also fails", async () => {
+  const handlerError = new Error("handler failed");
+  const handler = withRequestLogging(
+    async () => {
+      throw handlerError;
+    },
+    {
+      logger: {
+        info: () => {
+          throw new Error("logger unavailable");
+        },
+      },
+    },
+  );
+
+  await assert.rejects(handler(createRequest(), createResponse()), handlerError);
+});
+
+test("withRequestLogging forwards extra handler arguments", async () => {
+  const context = { traceId: "trace-1" };
+  let receivedContext;
+  const handler = withRequestLogging(
+    async (request, response, extra) => {
+      receivedContext = extra;
+      sendJson(response, 200, { ok: true });
+    },
+    {
+      logger: {
+        info: () => {},
+      },
+    },
+  );
+
+  await handler(createRequest(), createResponse(), context);
+
+  assert.equal(receivedContext, context);
+});
+
+test("withRequestLogging fallback path omits query-like sensitive text", async () => {
+  const logs = [];
+  const handler = withRequestLogging(
+    async (request, response) => {
+      sendJson(response, 200, { ok: true });
+    },
+    {
+      logger: {
+        info: (message) => logs.push(message),
+      },
+      now: (() => {
+        const values = [50, 55];
+        return () => values.shift();
+      })(),
+    },
+  );
+
+  await handler(createRequest({ url: "http://[::1?token=secret" }), createResponse());
+
+  assert.equal(logs.length, 1);
+  assert.match(logs[0], /GET http:\/\/\[::1 200 5ms/);
+  assert.doesNotMatch(logs[0], /token/);
+  assert.doesNotMatch(logs[0], /secret/);
+});

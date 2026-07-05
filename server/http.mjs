@@ -26,22 +26,27 @@ function getLogPath(request) {
   try {
     return new URL(request.url ?? "/", "http://localhost").pathname;
   } catch {
-    return request.url ?? "/";
+    return (request.url ?? "/").split(/[?#]/, 1)[0] || "/";
   }
 }
 
 export function withRequestLogging(handler, { logger = console, now = Date.now } = {}) {
-  return async function loggedHandler(request, response) {
+  return async function loggedHandler(request, response, ...args) {
     const startedAt = now();
 
     try {
-      await handler(request, response);
+      await handler(request, response, ...args);
     } finally {
       const durationMs = Math.max(0, now() - startedAt);
       const method = request.method ?? "UNKNOWN";
       const path = getLogPath(request);
       const statusCode = response.statusCode || 500;
-      logger.info(`${method} ${path} ${statusCode} ${durationMs}ms`);
+
+      try {
+        logger.info(`${method} ${path} ${statusCode} ${durationMs}ms`);
+      } catch {
+        // Logging is best-effort and must not affect request handling.
+      }
     }
   };
 }

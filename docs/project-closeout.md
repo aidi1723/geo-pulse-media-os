@@ -112,6 +112,19 @@ https://github.com/aidi1723/geo-pulse-media-os
 - `CHANGELOG.md`
 - `docs/system-architecture.md`
 - `docs/maintenance-guide.md`
+- `docs/operations-runbook.md`
+- `docs/release-checklist.md`
+
+### 5. 生产工程基础
+
+已补齐当前原型进入下一阶段生产化所需的基础工程边界：
+
+- GitHub Actions CI 在 push/PR 到 `main` 时运行安装、测试和构建。
+- `.env.example` 记录前端 API base URL 和本地 API host/port/state file 配置。
+- `/api/health` 和 `/api/readiness` 提供本地服务健康和状态存储就绪检查。
+- 本地 API 请求日志记录 method、path、status、duration，不记录 query 和 body。
+- 应用级 `ErrorBoundary` 为 render-time 前端失败提供兜底界面。
+- 运维 runbook 和 release checklist 已纳入文档入口。
 
 ## 验证记录
 
@@ -124,7 +137,7 @@ npm run build
 
 最近一次验证结果：
 
-- `npm test`: 43 个测试通过
+- `npm test`: 67 个测试通过
 - `npm run build`: Vite production build 成功
 
 ## GitHub 状态
@@ -164,8 +177,8 @@ main
 ### 中优先级
 
 1. 增加 Playwright 或浏览器级 smoke test 脚本。
-2. 给 GitHub 仓库补充 GitHub Actions，自动运行 `npm test` 和 `npm run build`。
-3. 为真实 API 接入设计 `Topic Intelligence`、`Content Studio`、`Distribution Engine` 的接口草案。
+2. 为真实 API 接入设计 `Topic Intelligence`、`Content Studio`、`Distribution Engine` 的接口草案。
+3. 规划生产持久化和鉴权方案，并重新定义无副作用 readiness。
 
 ### 低优先级
 

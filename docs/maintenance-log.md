@@ -173,7 +173,7 @@ npm run build
 7. 提交并推送：
 
 ```bash
-git add .
+git add <本次变更文件>
 git commit -m "..."
 git push
 ```

@@ -18,7 +18,7 @@ export async function openWorkspaceFromJob({
 
     if (selectedJob.scenarioKey !== scenarioKey) {
       const scenarioPayload = await services.loadScenarioContext(selectedJob.scenarioKey);
-      currentTopics = scenarioPayload.topics;
+      currentTopics = Array.isArray(scenarioPayload?.topics) ? scenarioPayload.topics : topics;
     }
 
     const artifact = selectedJob.artifact;
@@ -46,8 +46,9 @@ export async function openWorkspaceFromJob({
     }
 
     if (artifact?.type === "distribution_plan") {
+      const channels = Array.isArray(artifact.channels) ? artifact.channels : [];
       ui.setActiveView("distribution");
-      ui.setHighlightedChannelNames(artifact.channels.map((channel) => channel.name));
+      ui.setHighlightedChannelNames(channels.map((channel) => channel.name));
       workspace.setBanner(`已从任务“${selectedJob.label}”定位到对应分发排期。`);
       return;
     }

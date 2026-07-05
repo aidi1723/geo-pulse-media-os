@@ -143,6 +143,40 @@ test("copy draft loads scenario context when selected job scenario differs", asy
   ]);
 });
 
+test("cross-scenario copy draft falls back to current topics when loaded payload has no topics", async () => {
+  const recorder = createRecorder({
+    scenarioPayload: {
+      scenario: { key: "beauty" },
+    },
+  });
+
+  await openWorkspaceFromJob({
+    selectedJob: {
+      label: "跨场景文案",
+      scenarioKey: "beauty",
+      artifact: {
+        type: "copy_draft",
+        title: "AI 手机发布会预热",
+      },
+    },
+    scenarioKey: "consumer-tech",
+    topics: baseTopics,
+    services: recorder.services,
+    workspace: recorder.workspace,
+    ui: recorder.ui,
+  });
+
+  assert.deepEqual(recorder.calls, [
+    ["busy", "open-workspace"],
+    ["loadScenario", "beauty"],
+    ["topic", "AI 手机发布会预热\n\n关注影像和端侧 AI 卖点。\n\n机会点: 参数对比 + 场景体验"],
+    ["view", "studio"],
+    ["highlighted", []],
+    ["banner", "已从任务“跨场景文案”回到创作舱。"],
+    ["busy", ""],
+  ]);
+});
+
 test("distribution plan routes to distribution and highlights channel names", async () => {
   const recorder = createRecorder();
 
@@ -169,6 +203,33 @@ test("distribution plan routes to distribution and highlights channel names", as
     ["busy", "open-workspace"],
     ["view", "distribution"],
     ["highlighted", ["小红书", "视频号"]],
+    ["banner", "已从任务“分发排期”定位到对应分发排期。"],
+    ["busy", ""],
+  ]);
+});
+
+test("distribution plan with missing channels routes to distribution with empty highlights", async () => {
+  const recorder = createRecorder();
+
+  await openWorkspaceFromJob({
+    selectedJob: {
+      label: "分发排期",
+      scenarioKey: "consumer-tech",
+      artifact: {
+        type: "distribution_plan",
+      },
+    },
+    scenarioKey: "consumer-tech",
+    topics: baseTopics,
+    services: recorder.services,
+    workspace: recorder.workspace,
+    ui: recorder.ui,
+  });
+
+  assert.deepEqual(recorder.calls, [
+    ["busy", "open-workspace"],
+    ["view", "distribution"],
+    ["highlighted", []],
     ["banner", "已从任务“分发排期”定位到对应分发排期。"],
     ["busy", ""],
   ]);

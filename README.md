@@ -17,12 +17,16 @@
 - `src/state/workspaceState.js`: bootstrap payload、默认工作区和 fallback 状态映射
 - `src/data/mockData.js`: 模拟选题、分发、安全和场景数据
 - `src/services/orchestrator.js`: 前端访问本地 API 的请求层
+- `.github/workflows/ci.yml`: GitHub Actions CI，push/PR 到 `main` 时运行安装、测试和构建
+- `.env.example`: 前端和本地 API 的环境变量示例
 - `tests/server/*.test.mjs`: 本地 API 和领域行为测试
 - `tests/src/*.test.mjs`: 纯工具、状态映射和 workflow action 测试
 - `tests/ui/*.test.jsx`: React 组件、hook 和工作流测试
 - `DESIGN.md`: 当前 UI 视觉规则、组件状态和响应式基准
 - `docs/system-architecture.md`: 系统分层和后续落地路线
 - `docs/maintenance-guide.md`: 维护路径、更新流程和 GitHub 发布检查清单
+- `docs/operations-runbook.md`: 本地启动、环境变量、健康检查和常见故障处理
+- `docs/release-checklist.md`: 发布前检查清单
 - `docs/project-closeout.md`: 项目收尾状态、交付内容、验证记录和后续路线
 - `docs/maintenance-log.md`: 维护路径日志、近期更新记录和下一轮维护优先级
 - `legacy/`: 第一版纯静态原型保留
@@ -75,6 +79,7 @@ npm test
 当前已经内置一个带任务状态的本地 API，主要端点如下：
 
 - `GET /api/health`
+- `GET /api/readiness`
 - `GET /api/bootstrap?scenario=consumer-tech`
 - `GET /api/jobs`
 - `GET /api/jobs/:jobId`
@@ -125,6 +130,16 @@ npm run reset:api-state
 
 这样可以清空上一次演示残留的审批、备注和任务状态。
 
+## 生产工程基础
+
+- CI：`.github/workflows/ci.yml` 在 push/PR 到 `main` 时使用 Node 22 执行 `npm ci`、`npm test` 和 `npm run build`。
+- 前端配置：`VITE_API_BASE_URL` 控制 API base URL，留空时保持相对 `/api` 请求和本地 Vite proxy 行为。
+- API 配置：`GEO_PULSE_API_HOST`、`GEO_PULSE_API_PORT`、`GEO_PULSE_STATE_FILE` 分别控制本地 API 监听地址、端口和 JSON 状态文件路径。
+- 健康检查：`GET /api/health` 返回服务健康和元数据，`GET /api/readiness` 检查本地状态存储可读性。
+- 请求日志：本地 API 记录 method、path、status、duration，不记录 query 内容和 request body。
+- 前端兜底：应用级 `ErrorBoundary` 处理 render-time 失败，排查时优先看浏览器 console、Vite 日志和 API 日志。
+- 运维文档：`docs/operations-runbook.md` 记录启动、健康检查和恢复步骤，`docs/release-checklist.md` 记录发布前检查项。
+
 ## 后续建议
 
 1. 先把 `src/services/orchestrator.js` 替换成真实 API 层，接入选题采集和生成服务。
@@ -137,6 +152,8 @@ npm run reset:api-state
 维护入口：
 
 - `docs/maintenance-guide.md`: 查具体维护路径和更新流程
+- `docs/operations-runbook.md`: 查本地启动、环境变量、健康检查和故障恢复
+- `docs/release-checklist.md`: 查发布前检查项和 CI 确认流程
 - `docs/project-closeout.md`: 查当前交付状态、验证记录和未完成事项
 - `docs/maintenance-log.md`: 查维护日志、路径变更和下一轮优先级
 

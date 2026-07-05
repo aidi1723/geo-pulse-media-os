@@ -4,6 +4,12 @@
 
 ### Added
 
+- Added GitHub Actions CI for push and pull request checks on `main` with Node 22, `npm ci`, `npm test`, and `npm run build`.
+- Added `.env.example` documenting frontend and local API runtime configuration.
+- Added `GET /api/readiness` alongside enriched `/api/health` metadata for local operational checks.
+- Added local API request logging for method, path, status, and duration without query content or request bodies.
+- Added an app-level `ErrorBoundary` fallback for render-time frontend failures.
+- Added `docs/operations-runbook.md` and `docs/release-checklist.md` for local operations, health/readiness checks, and release verification.
 - Added `docs/maintenance-guide.md` with maintenance paths, content update checklist, test ownership, build artifact guidance, and GitHub release checklist.
 - Added `docs/project-closeout.md` with project status, delivery contents, verification record, GitHub status, and next priorities.
 - Added `docs/maintenance-log.md` with path ownership, recent update records, next maintenance tasks, and risk notes.
@@ -14,7 +20,9 @@
 
 ### Changed
 
+- Updated runtime API configuration so the frontend can use `VITE_API_BASE_URL` and the local server can be overridden with `GEO_PULSE_API_HOST`, `GEO_PULSE_API_PORT`, and `GEO_PULSE_STATE_FILE`.
 - Updated `README.md` with current module responsibilities, maintenance entry points, and verification commands.
+- Updated `README.md` with CI, environment configuration, health/readiness endpoints, request logging, error boundary behavior, and operations documentation links.
 - Updated `docs/system-architecture.md` with the current frontend state/action split, server responsibilities, and next refactor boundaries.
 - Updated `docs/maintenance-guide.md` with the public GitHub repository location and branch tracking status.
 - Moved Studio asset mode options from static mock imports to workspace payload-driven props.
@@ -24,7 +32,7 @@
 
 ### Verification
 
-- `npm test` — 43 tests passing.
+- `npm test` — 67 tests passing.
 - `npm run build` — Vite production build completed.
 
 ## 2026-05-23

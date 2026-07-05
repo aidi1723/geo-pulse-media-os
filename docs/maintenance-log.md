@@ -14,19 +14,47 @@
 | 工作区状态映射 | `src/state/workspaceState.js` | 已集中 bootstrap 和 fallback 规则 | 新增字段时同步测试 |
 | 工作区状态控制 | `src/hooks/useWorkspaceController.js` | 已封装 workspace state 和 focused setters | 视情况补更细的 controller 动作 |
 | 工作流动作 | `src/actions/workflowActions.js` | 已覆盖生成、工作流、刷新、分发 | 后续加入真实 API 错误分类 |
-| API 请求层 | `src/services/orchestrator.js` | 当前为 fetch wrapper | 后续补 schema 或类型契约 |
+| API 请求层 | `src/services/orchestrator.js`, `src/config/runtimeConfig.js` | 支持 `VITE_API_BASE_URL`，留空保持相对 `/api` 行为 | 后续补 schema 或类型契约 |
 | UI 区块 | `src/sections/*` | 当前按业务域拆分 | 保持 props 驱动，不直接耦合 mock 数据 |
 | 复用组件 | `src/components/*` | 任务板和详情组件已拆分 | 后续评估任务详情是否继续拆 artifact view |
-| 本地 API 路由 | `server/router.mjs` | 当前为手写路由 | 端点增加后考虑路由表或轻量 router |
+| 本地 API 路由 | `server/router.mjs`, `server/http.mjs` | 已有 health/readiness、请求日志和错误响应边界 | 端点增加后考虑路由表或轻量 router |
 | 本地 API 领域逻辑 | `server/domain.mjs` | 当前承载任务和草稿生成规则 | 后续拆 job state machine |
-| 本地状态存储 | `server/state-store.mjs` | 支持默认存储和测试隔离 store | 后续迁移数据库时替换该边界 |
+| 本地状态存储 | `server/state-store.mjs` | 支持默认存储、测试隔离 store 和 readiness 读取检查 | 迁移生产持久化时替换该边界，并处理 readiness 无副作用语义 |
 | 演示状态数据 | `server/data/state.json` | 用于本地演示 | 演示前运行 reset 脚本 |
 | 静态演示数据 | `src/data/mockData.js` | 提供场景和 fallback 数据 | 接真实 API 后逐步降级为 demo seed |
-| 样式系统 | `src/styles.css` 和 `DESIGN.md` | 使用全局 CSS tokens | 组件增多后考虑拆样式分区 |
-| 测试 | `tests/` | 当前 43 个测试 | 新模块必须同步加入默认 test script |
-| 文档 | `README.md`, `CHANGELOG.md`, `docs/*` | 已补维护和收尾文档 | 每次结构变更同步更新 |
+| 样式系统 | `src/styles.css` 和 `DESIGN.md` | 使用全局 CSS tokens，并有应用级 ErrorBoundary 兜底渲染失败 | 组件增多后考虑拆样式分区 |
+| 测试 | `tests/` | 当前 67 个测试，默认 `npm test` 覆盖 server/src/ui | 新模块必须同步加入默认 test script |
+| 文档 | `README.md`, `CHANGELOG.md`, `docs/*`, `.env.example` | 已补生产工程基础、运维 runbook 和发布 checklist | 每次结构、配置、启动方式或发布流程变更同步更新 |
 
 ## 最近更新记录
+
+### 2026-07-05: 生产工程基础补齐
+
+更新内容：
+
+- 新增 `.github/workflows/ci.yml`，push/PR 到 `main` 时使用 Node 22 执行 `npm ci`、`npm test` 和 `npm run build`。
+- 新增 `.env.example`，记录 `VITE_API_BASE_URL`、`GEO_PULSE_API_HOST`、`GEO_PULSE_API_PORT` 和 `GEO_PULSE_STATE_FILE`。
+- 本地 API 增加可配置 host/port/state file、`/api/health` 元数据和 `/api/readiness`。
+- 本地 API 增加 best-effort 请求日志，记录 method、path、status、duration，不记录 query 内容和 body。
+- 前端增加应用级 `ErrorBoundary`，为 render-time 失败提供兜底界面。
+- 新增 `docs/operations-runbook.md` 和 `docs/release-checklist.md`。
+
+维护影响：
+
+- 发布前检查从人工约定变为 CI 和 checklist 双轨。
+- 本地 API 配置集中到 env，演示和测试环境可覆盖监听地址、端口和状态文件。
+- readiness 当前通过本地 mock API 的 `readState()` 检查状态文件，缺失文件时可能创建或 seed 状态文件。
+
+验证：
+
+- `npm test`，67 个测试通过。
+- `npm run build`
+- `git diff --check`
+
+下一步建议：
+
+- 规划生产持久化、鉴权和真实发布集成时，重新定义 readiness，避免生产探针产生写入副作用。
+- 为真实 API 接入补 schema/type contract，减少前端 fetch wrapper 的隐式契约。
 
 ### 2026-07-05: 公开仓库首版整理
 
@@ -189,28 +217,26 @@ git push
 - `topic_refresh` 要回到 discovery。
 - 跨场景任务要先加载对应 scenario context。
 
-### 第三优先级：GitHub Actions
+### 第三优先级：生产持久化、鉴权和真实集成规划
 
 目标：
 
-- 每次 push 自动运行测试和构建。
+- 明确本地 mock API 到生产服务的替换边界。
+- 规划账号鉴权、租户隔离、审计和真实发布器接入。
+- 重新定义生产 readiness，避免探针触发状态创建或 seed。
 
 建议新路径：
 
-- `.github/workflows/ci.yml`
-
-建议命令：
-
-```bash
-npm ci
-npm test
-npm run build
-```
+- `docs/system-architecture.md`
+- `docs/operations-runbook.md`
+- 后续真实服务目录或 API contract 文档
 
 ## 风险记录
 
 - 当前仍是本地 mock API，不具备生产鉴权、真实账号隔离或真实发布能力。
 - `server/data/state.json` 是演示状态，不是可靠数据库。
+- `/api/readiness` 当前会调用 `readState()`，在本地 mock API 中可能创建或 seed 缺失的状态文件；生产 readiness 需要改成无副作用检查。
+- 当前没有真实发布平台集成，分发动作仍是本地演示状态流转。
 - `src/styles.css` 是单文件样式系统，后续 UI 继续扩张时需要拆分维护。
 - `legacy/` 仍保留第一版原型，后续需要决定归档或删除。
 - `docs/superpowers/*` 是过程文档，公开仓库保留时应确认是否符合长期维护策略。

@@ -18,15 +18,36 @@
 | UI 区块 | `src/sections/*` | 当前按业务域拆分 | 保持 props 驱动，不直接耦合 mock 数据 |
 | 复用组件 | `src/components/*` | 任务板和详情组件已拆分 | 后续评估任务详情是否继续拆 artifact view |
 | 本地 API 路由 | `server/router.mjs`, `server/http.mjs` | 已有 health/readiness、请求日志和错误响应边界 | 端点增加后考虑路由表或轻量 router |
-| 本地 API 领域逻辑 | `server/domain.mjs` | 当前承载任务和草稿生成规则 | 后续拆 job state machine |
+| 本地 API 领域逻辑 | `server/domain.mjs`, `server/job-state-machine.mjs` | 当前承载任务、草稿生成规则和独立任务状态机 | 后续继续拆真实队列或 worker 边界 |
 | 本地状态存储 | `server/state-store.mjs` | 支持默认存储、测试隔离 store 和 readiness 读取检查 | 迁移生产持久化时替换该边界，并处理 readiness 无副作用语义 |
 | 演示状态数据 | `server/data/state.json` | 用于本地演示 | 演示前运行 reset 脚本 |
 | 静态演示数据 | `src/data/mockData.js` | 提供场景和 fallback 数据 | 接真实 API 后逐步降级为 demo seed |
 | 样式系统 | `src/styles.css` 和 `DESIGN.md` | 使用全局 CSS tokens，并有应用级 ErrorBoundary 兜底渲染失败 | 组件增多后考虑拆样式分区 |
-| 测试 | `tests/` | 当前 93 个测试，默认 `npm test` 覆盖 server/src/ui | 新模块必须同步加入默认 test script |
+| 测试 | `tests/` | 当前 103 个测试，默认 `npm test` 覆盖 server/src/ui | 新模块必须同步加入默认 test script |
 | 文档 | `README.md`, `CHANGELOG.md`, `docs/*`, `.env.example` | 已补生产工程基础、运维 runbook 和发布 checklist | 每次结构、配置、启动方式或发布流程变更同步更新 |
 
 ## 最近更新记录
+
+### 2026-07-05: 任务状态机拆分
+
+更新内容：
+
+- 新增 `server/job-state-machine.mjs`，集中维护 approve/reject/retry/cancel 的任务状态转换规则。
+- 新增 `tests/server/job-state-machine.test.mjs`，覆盖任务可用动作、审核、驳回、重试、取消和非法动作。
+- 更新 `server/domain.mjs`，保留任务查找、备注、历史和状态持久化职责，将状态转换委托给状态机模块。
+
+维护影响：
+
+- 后续任务状态规则调整优先进入 `server/job-state-machine.mjs`。
+- `server/domain.mjs` 不应重新吸收动作状态转换细节。
+- 接真实队列或 worker 前，应先扩展状态机测试覆盖异步执行状态。
+
+验证：
+
+- `node --test tests/server/job-state-machine.test.mjs tests/server/domain.test.mjs tests/server/router.test.mjs`
+- `npm test`
+- `npm run build`
+- GitHub Actions CI
 
 ### 2026-07-05: CI runtime 稳定性维护
 
@@ -259,19 +280,20 @@ git push
 - 先覆盖错误响应和可选字段 fallback。
 - 合约更新必须同步 mock API 测试。
 
-### 第三优先级：任务状态机拆分
+### 第三优先级：真实队列或 worker 边界规划
 
 目标：
 
-- 从 `server/domain.mjs` 拆出任务状态流转规则。
-- 明确 approve/reject/retry/cancel 在不同状态下的合法转换。
-- 为真实队列或 worker 接入保留边界。
+- 明确当前同步 mock 状态流转和未来异步执行队列的替换边界。
+- 规划任务入队、执行中、完成、失败、重试的 worker 事件模型。
+- 保持 API 层不直接依赖具体队列实现。
 
 建议新路径：
 
-- `server/job-state-machine.mjs`
-- `tests/server/job-state-machine.test.mjs`
 - `server/domain.mjs`
+- `server/job-state-machine.mjs`
+- 后续 `server/job-worker-adapter.mjs`
+- 后续 `tests/server/job-worker-adapter.test.mjs`
 
 ## 风险记录
 

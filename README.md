@@ -100,6 +100,7 @@ npm test
 - `server/state-store.mjs`: JSON 状态持久化
 - `server/reset-state.mjs`: 将演示状态重置为干净种子
 - `server/domain.mjs`: 选题、生成、发布任务的领域逻辑
+- `server/job-state-machine.mjs`: 任务审核、重试和取消的状态转换规则
 - `server/data/state.json`: 当前本地任务表和热点池
 
 当前任务动作支持：
@@ -168,6 +169,7 @@ npm run reset:api-state
 - 调整任务备注、审核、重试、取消等动作：`src/actions/jobActions.js`
 - 调整任务产物回到工作区的路由：`src/actions/artifactRouting.js`
 - 调整本地 API 行为：`server/domain.mjs` 和 `server/router.mjs`
+- 调整任务状态转换：`server/job-state-machine.mjs`
 - 调整设计风格：先看 `DESIGN.md`，再改 `src/styles.css`
 - 调整演示内容：`src/data/mockData.js` 和 `server/data/state.json`
 

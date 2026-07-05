@@ -9,6 +9,7 @@ import OverviewSection from "./sections/OverviewSection";
 import SecuritySection from "./sections/SecuritySection";
 import StudioSection from "./sections/StudioSection";
 import VideoSection from "./sections/VideoSection";
+import { createJobActions } from "./actions/jobActions";
 import { createWorkflowActions } from "./actions/workflowActions";
 import { useWorkspaceController } from "./hooks/useWorkspaceController";
 import { resolveSelectedJobId } from "./utils/jobs";
@@ -131,6 +132,27 @@ export default function App() {
       scenarioKey,
     }),
   });
+  const jobActions = createJobActions({
+    services: {
+      addJobNote,
+      runJobAction,
+    },
+    workspace: {
+      setSelectedJob,
+      setJobs: setAppJobs,
+      setBanner,
+    },
+    ui: {
+      setJobActionBusy,
+      setHighlightedChannelNames,
+      setJobNoteDraft,
+      setAppError,
+    },
+    getState: () => ({
+      selectedJobId,
+      jobNoteDraft,
+    }),
+  });
 
   useEffect(() => {
     setSuggestion(suggestions[activeView]);
@@ -233,47 +255,8 @@ export default function App() {
   const handleRunWorkflow = workflowActions.runWorkflow;
   const handleRefreshTopics = workflowActions.refreshTopics;
   const handleScheduleDistribution = workflowActions.scheduleDistribution;
-
-  async function handleSaveNote() {
-    if (!selectedJobId || !jobNoteDraft.trim()) {
-      return;
-    }
-
-    setJobActionBusy("note");
-    try {
-      const result = await addJobNote(selectedJobId, jobNoteDraft.trim());
-      setSelectedJob(result.job);
-      setAppJobs(result.jobs);
-      setBanner(result.banner);
-      setJobNoteDraft("");
-      setAppError("");
-    } catch (error) {
-      setAppError(error.message);
-    } finally {
-      setJobActionBusy("");
-    }
-  }
-
-  async function handleJobAction(action) {
-    if (!selectedJobId) {
-      return;
-    }
-
-    setJobActionBusy(action);
-    try {
-      const result = await runJobAction(selectedJobId, action, jobNoteDraft.trim());
-      setSelectedJob(result.job);
-      setAppJobs(result.jobs);
-      setBanner(result.banner);
-      setHighlightedChannelNames([]);
-      setJobNoteDraft("");
-      setAppError("");
-    } catch (error) {
-      setAppError(error.message);
-    } finally {
-      setJobActionBusy("");
-    }
-  }
+  const handleSaveNote = jobActions.saveNote;
+  const handleJobAction = jobActions.runAction;
 
   function handleSelectTopic(topic) {
     setSelectedTopic(createTopicPayload(topic));

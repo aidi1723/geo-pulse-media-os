@@ -10,6 +10,7 @@ import SecuritySection from "./sections/SecuritySection";
 import StudioSection from "./sections/StudioSection";
 import VideoSection from "./sections/VideoSection";
 import { createJobActions } from "./actions/jobActions";
+import { openWorkspaceFromJob } from "./actions/artifactRouting";
 import { createWorkflowActions } from "./actions/workflowActions";
 import { useWorkspaceController } from "./hooks/useWorkspaceController";
 import { resolveSelectedJobId } from "./utils/jobs";
@@ -266,61 +267,14 @@ export default function App() {
   }
 
   async function handleOpenWorkspaceFromJob() {
-    if (!selectedJob) {
-      return;
-    }
-
-    setBusyAction("open-workspace");
-    try {
-      let scenarioPayload = null;
-
-      if (selectedJob.scenarioKey !== scenarioKey) {
-        scenarioPayload = await loadScenarioContext(selectedJob.scenarioKey);
-      }
-
-      const currentTopics = scenarioPayload?.topics ?? topics;
-      const artifact = selectedJob.artifact;
-
-      if (artifact?.type === "copy_draft") {
-        const matchTopic = currentTopics.find((item) => item.title === artifact.title);
-        setSelectedTopic(
-          matchTopic
-            ? createTopicPayload(matchTopic)
-            : `${artifact.title}\n\n来自任务产物预览`,
-        );
-        if (artifact.content) {
-          setCopyPreview(artifact.content);
-        }
-        if (artifact.tone) {
-          setTone(artifact.tone);
-        }
-        if (artifact.assetMode) {
-          setAssetMode(artifact.assetMode);
-        }
-        setActiveView("studio");
-        setHighlightedChannelNames([]);
-        setBanner(`已从任务“${selectedJob.label}”回到创作舱。`);
-        return;
-      }
-
-      if (artifact?.type === "distribution_plan") {
-        setActiveView("distribution");
-        setHighlightedChannelNames(artifact.channels.map((channel) => channel.name));
-        setBanner(`已从任务“${selectedJob.label}”定位到对应分发排期。`);
-        return;
-      }
-
-      if (artifact?.type === "topic_refresh") {
-        setActiveView("discovery");
-        setHighlightedChannelNames([]);
-        setBanner(`已从任务“${selectedJob.label}”回到选题雷达。`);
-        return;
-      }
-    } catch (error) {
-      setAppError(error.message);
-    } finally {
-      setBusyAction("");
-    }
+    return openWorkspaceFromJob({
+      selectedJob,
+      scenarioKey,
+      topics,
+      services: { loadScenarioContext },
+      workspace: { setSelectedTopic, setCopyPreview, setTone, setAssetMode, setBanner },
+      ui: { setActiveView, setHighlightedChannelNames, setBusyAction, setAppError },
+    });
   }
 
   function renderPanel() {

@@ -2,31 +2,26 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { Readable } from "node:stream";
 
-let handleRequestModule;
-
 async function loadHandleRequest(env = {}) {
-  if (!handleRequestModule) {
-    const previousEnv = {
-      GEO_PULSE_API_HOST: process.env.GEO_PULSE_API_HOST,
-      GEO_PULSE_API_PORT: process.env.GEO_PULSE_API_PORT,
-    };
+  const previousEnv = {
+    GEO_PULSE_API_HOST: process.env.GEO_PULSE_API_HOST,
+    GEO_PULSE_API_PORT: process.env.GEO_PULSE_API_PORT,
+  };
 
-    Object.assign(process.env, env);
+  Object.assign(process.env, env);
 
-    try {
-      handleRequestModule = await import(`../../server/router.mjs?case=${Date.now()}-${Math.random()}`);
-    } finally {
-      for (const [key, value] of Object.entries(previousEnv)) {
-        if (value === undefined) {
-          delete process.env[key];
-        } else {
-          process.env[key] = value;
-        }
+  try {
+    const module = await import(`../../server/router.mjs?case=${Date.now()}-${Math.random()}`);
+    return module.handleRequest;
+  } finally {
+    for (const [key, value] of Object.entries(previousEnv)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
       }
     }
   }
-
-  return handleRequestModule.handleRequest;
 }
 
 function createRequest({ method = "GET", url = "/", body } = {}) {

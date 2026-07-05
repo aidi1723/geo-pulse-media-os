@@ -78,12 +78,14 @@ test("runWorkflow posts scenario key to workflow endpoint", async () => {
 
   await client.runWorkflow("consumer-tech");
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/workflow",
-    method: "POST",
-    body: { scenarioKey: "consumer-tech" },
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/workflow",
+      method: "POST",
+      body: { scenarioKey: "consumer-tech" },
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("switchScenario posts scenario key to scenario endpoint", async () => {
@@ -91,12 +93,14 @@ test("switchScenario posts scenario key to scenario endpoint", async () => {
 
   await client.switchScenario("beauty-skincare");
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/scenario",
-    method: "POST",
-    body: { scenarioKey: "beauty-skincare" },
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/scenario",
+      method: "POST",
+      body: { scenarioKey: "beauty-skincare" },
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("refreshTopics posts scenario key to topic refresh endpoint", async () => {
@@ -104,12 +108,14 @@ test("refreshTopics posts scenario key to topic refresh endpoint", async () => {
 
   await client.refreshTopics("education-knowledge");
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/topics/refresh",
-    method: "POST",
-    body: { scenarioKey: "education-knowledge" },
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/topics/refresh",
+      method: "POST",
+      body: { scenarioKey: "education-knowledge" },
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("generateDraft posts full generation payload", async () => {
@@ -124,12 +130,14 @@ test("generateDraft posts full generation payload", async () => {
 
   await client.generateDraft(payload);
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/generate",
-    method: "POST",
-    body: payload,
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/generate",
+      method: "POST",
+      body: payload,
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("scheduleDistribution posts scenario key to distribution endpoint", async () => {
@@ -137,12 +145,14 @@ test("scheduleDistribution posts scenario key to distribution endpoint", async (
 
   await client.scheduleDistribution({ scenarioKey: "consumer-tech" });
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/distribution/schedule",
-    method: "POST",
-    body: { scenarioKey: "consumer-tech" },
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/distribution/schedule",
+      method: "POST",
+      body: { scenarioKey: "consumer-tech" },
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("runJobAction posts action and note to job action endpoint", async () => {
@@ -150,12 +160,14 @@ test("runJobAction posts action and note to job action endpoint", async () => {
 
   await client.runJobAction("job-1", "approve", "同意发布");
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/jobs/job-1/action",
-    method: "POST",
-    body: { action: "approve", note: "同意发布" },
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/jobs/job-1/action",
+      method: "POST",
+      body: { action: "approve", note: "同意发布" },
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("addJobNote posts note to job note endpoint", async () => {
@@ -163,12 +175,14 @@ test("addJobNote posts note to job note endpoint", async () => {
 
   await client.addJobNote("job-1", "复核封面");
 
-  assert.deepEqual(calls[0], {
-    url: "https://api.example.com/api/jobs/job-1/note",
-    method: "POST",
-    body: { note: "复核封面" },
-    headers: { "Content-Type": "application/json" },
-  });
+  assert.deepEqual(calls, [
+    {
+      url: "https://api.example.com/api/jobs/job-1/note",
+      method: "POST",
+      body: { note: "复核封面" },
+      headers: { "Content-Type": "application/json" },
+    },
+  ]);
 });
 
 test("orchestrator client throws extracted API errors from failed responses", async () => {

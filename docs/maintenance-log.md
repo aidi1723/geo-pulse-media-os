@@ -28,6 +28,25 @@
 
 ## 最近更新记录
 
+### 2026-07-05: CI runtime 稳定性维护
+
+更新内容：
+
+- 将 `.github/workflows/ci.yml` 的 `actions/checkout` 升级到 `v7.0.0`。
+- 将 `.github/workflows/ci.yml` 的 `actions/setup-node` 升级到 `v6.4.0`。
+- 保持项目验证运行时为 Node 22，不改变本地开发和构建命令。
+
+维护影响：
+
+- 消除 GitHub Actions 对旧 action runtime 的弃用提醒。
+- CI 仍执行 `npm ci`、`npm test` 和 `npm run build`。
+
+验证：
+
+- `npm test`
+- `npm run build`
+- GitHub Actions CI
+
 ### 2026-07-05: 内部稳定性收敛
 
 更新内容：

@@ -23,6 +23,7 @@
 
 ### Changed
 
+- Updated GitHub Actions CI to `actions/checkout@v7.0.0` and `actions/setup-node@v6.4.0` while keeping the project runtime on Node 22.
 - Updated runtime API configuration so the frontend can use `VITE_API_BASE_URL` and the local server can be overridden with `GEO_PULSE_API_HOST`, `GEO_PULSE_API_PORT`, and `GEO_PULSE_STATE_FILE`.
 - Updated `README.md` with current module responsibilities, maintenance entry points, and verification commands.
 - Updated `README.md` with CI, environment configuration, health/readiness endpoints, request logging, error boundary behavior, and operations documentation links.

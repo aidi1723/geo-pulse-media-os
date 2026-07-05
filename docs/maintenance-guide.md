@@ -211,4 +211,10 @@ Before pushing to GitHub:
 6. Commit with a clear message.
 7. Push to the intended branch.
 
-Current note: this working directory is not a git repository unless a `.git` directory is added or the project is copied into an existing repo.
+Current repository:
+
+```text
+https://github.com/aidi1723/geo-pulse-media-os
+```
+
+The local `main` branch tracks `origin/main`.

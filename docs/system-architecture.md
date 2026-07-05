@@ -137,6 +137,8 @@ type PublishJob = {
 - `tests/src/*`: 工具函数、状态映射和 workflow action 测试
 - `tests/ui/*`: React 组件、hook 和用户工作流测试
 - `docs/maintenance-guide.md`: 维护路径、更新流程和 GitHub 发布检查清单
+- `docs/project-closeout.md`: 项目收尾交接、验证记录和后续路线
+- `docs/maintenance-log.md`: 维护路径日志、近期更新和下一步优先级
 - `legacy/`: 第一版纯静态原型保留
 
 ## 当前重构边界

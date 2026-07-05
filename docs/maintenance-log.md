@@ -1,0 +1,230 @@
+# GEO-Pulse Maintenance Log
+
+更新日期：2026-07-05
+
+## 日志用途
+
+这份日志用于记录 GEO-Pulse 的维护路径、最近更新内容、负责人接手时的检查点，以及下一轮维护优先级。
+
+## 路径总览
+
+| 维护对象 | 主要路径 | 最近状态 | 下次维护重点 |
+| --- | --- | --- | --- |
+| 应用外壳 | `src/App.jsx` | 已拆出 workspace state 和 workflow actions | 继续拆 job actions 和 artifact routing |
+| 工作区状态映射 | `src/state/workspaceState.js` | 已集中 bootstrap 和 fallback 规则 | 新增字段时同步测试 |
+| 工作区状态控制 | `src/hooks/useWorkspaceController.js` | 已封装 workspace state 和 focused setters | 视情况补更细的 controller 动作 |
+| 工作流动作 | `src/actions/workflowActions.js` | 已覆盖生成、工作流、刷新、分发 | 后续加入真实 API 错误分类 |
+| API 请求层 | `src/services/orchestrator.js` | 当前为 fetch wrapper | 后续补 schema 或类型契约 |
+| UI 区块 | `src/sections/*` | 当前按业务域拆分 | 保持 props 驱动，不直接耦合 mock 数据 |
+| 复用组件 | `src/components/*` | 任务板和详情组件已拆分 | 后续评估任务详情是否继续拆 artifact view |
+| 本地 API 路由 | `server/router.mjs` | 当前为手写路由 | 端点增加后考虑路由表或轻量 router |
+| 本地 API 领域逻辑 | `server/domain.mjs` | 当前承载任务和草稿生成规则 | 后续拆 job state machine |
+| 本地状态存储 | `server/state-store.mjs` | 支持默认存储和测试隔离 store | 后续迁移数据库时替换该边界 |
+| 演示状态数据 | `server/data/state.json` | 用于本地演示 | 演示前运行 reset 脚本 |
+| 静态演示数据 | `src/data/mockData.js` | 提供场景和 fallback 数据 | 接真实 API 后逐步降级为 demo seed |
+| 样式系统 | `src/styles.css` 和 `DESIGN.md` | 使用全局 CSS tokens | 组件增多后考虑拆样式分区 |
+| 测试 | `tests/` | 当前 43 个测试 | 新模块必须同步加入默认 test script |
+| 文档 | `README.md`, `CHANGELOG.md`, `docs/*` | 已补维护和收尾文档 | 每次结构变更同步更新 |
+
+## 最近更新记录
+
+### 2026-07-05: 公开仓库首版整理
+
+更新内容：
+
+- 初始化 git 仓库。
+- 新建公开 GitHub 仓库 `aidi1723/geo-pulse-media-os`。
+- 推送 `main` 分支。
+- 排除 `node_modules`、`dist`、Playwright 临时文件、审查截图和未引用大图。
+
+维护影响：
+
+- 后续可直接在 GitHub 上协作和追踪。
+- `dist/` 不作为源码提交，发布前需要重新构建。
+
+验证：
+
+- `npm test`
+- `npm run build`
+
+### 2026-07-05: 文档维护体系补齐
+
+更新内容：
+
+- 新增 `docs/maintenance-guide.md`。
+- 新增 `docs/project-closeout.md`。
+- 新增 `docs/maintenance-log.md`。
+- 更新 `README.md` 的维护入口。
+- 更新 `CHANGELOG.md` 的 2026-07-05 记录。
+- 更新 `docs/system-architecture.md` 的当前模块映射。
+
+维护影响：
+
+- 新接手者可从 `README.md` 进入项目，再看维护指南和收尾文档。
+- 后续每次结构调整都应同步维护路径日志。
+
+验证：
+
+- 文档人工检查。
+- `npm test`
+- `npm run build`
+
+### 2026-07-05: 前端状态和动作拆分
+
+更新内容：
+
+- 新增 `src/state/workspaceState.js`。
+- 新增 `src/hooks/useWorkspaceController.js`。
+- 新增 `src/actions/workflowActions.js`。
+- 更新 `src/App.jsx`，减少直接承载的状态映射和 workflow handler。
+- 更新 `src/sections/StudioSection.jsx`，素材模式改为来自 workspace payload。
+
+维护影响：
+
+- 工作区字段从 `workspaceState` 维护。
+- workflow API 动作从 `workflowActions` 维护。
+- 页面组件更适合继续瘦身。
+
+验证：
+
+- `tests/src/workspace-state.test.mjs`
+- `tests/ui/workspace-controller.test.jsx`
+- `tests/src/workflow-actions.test.mjs`
+- `tests/ui/app-workflow.test.jsx`
+
+### 2026-07-05: 本地状态存储测试隔离
+
+更新内容：
+
+- `server/state-store.mjs` 新增 `createStateStore(stateFile)`。
+- `updateState` 支持 `{ nextState, response }`。
+- 新增 `tests/server/state-store.test.mjs`。
+
+维护影响：
+
+- 测试可以使用临时状态文件。
+- 避免测试污染 `server/data/state.json`。
+
+验证：
+
+- `tests/server/state-store.test.mjs`
+- `tests/server/router.test.mjs`
+
+## 每次维护的标准步骤
+
+1. 确认当前分支和远端：
+
+```bash
+git status --short --branch
+git remote -v
+```
+
+2. 根据修改类型选择路径：
+
+- UI 展示：`src/sections/` 或 `src/components/`
+- 工作区状态：`src/state/` 和 `src/hooks/`
+- 异步动作：`src/actions/`
+- API 请求：`src/services/`
+- 本地 API：`server/`
+- 视觉系统：`DESIGN.md` 和 `src/styles.css`
+- 文档：`README.md`, `CHANGELOG.md`, `docs/`
+
+3. 先写或更新测试。
+
+4. 修改实现。
+
+5. 更新文档和维护日志。
+
+6. 验证：
+
+```bash
+npm test
+npm run build
+```
+
+7. 提交并推送：
+
+```bash
+git add .
+git commit -m "..."
+git push
+```
+
+## 下次维护建议
+
+### 第一优先级：任务动作拆分
+
+目标：
+
+- 从 `App.jsx` 移出 `handleSaveNote`
+- 从 `App.jsx` 移出 `handleJobAction`
+
+建议新路径：
+
+- `src/actions/jobActions.js`
+- `tests/src/job-actions.test.mjs`
+
+注意点：
+
+- 保持任务动作 busy 状态。
+- 保持备注清空行为。
+- 保持 error banner 逻辑。
+- 不要在 action 内直接引用组件状态，继续使用依赖注入。
+
+### 第二优先级：Artifact Routing 拆分
+
+目标：
+
+- 从 `App.jsx` 移出 `handleOpenWorkspaceFromJob` 的 artifact 判断。
+
+建议新路径：
+
+- `src/actions/artifactRouting.js` 或 `src/state/artifactRouting.js`
+- `tests/src/artifact-routing.test.mjs`
+
+注意点：
+
+- `copy_draft` 要回到 studio。
+- `distribution_plan` 要回到 distribution。
+- `topic_refresh` 要回到 discovery。
+- 跨场景任务要先加载对应 scenario context。
+
+### 第三优先级：GitHub Actions
+
+目标：
+
+- 每次 push 自动运行测试和构建。
+
+建议新路径：
+
+- `.github/workflows/ci.yml`
+
+建议命令：
+
+```bash
+npm ci
+npm test
+npm run build
+```
+
+## 风险记录
+
+- 当前仍是本地 mock API，不具备生产鉴权、真实账号隔离或真实发布能力。
+- `server/data/state.json` 是演示状态，不是可靠数据库。
+- `src/styles.css` 是单文件样式系统，后续 UI 继续扩张时需要拆分维护。
+- `legacy/` 仍保留第一版原型，后续需要决定归档或删除。
+- `docs/superpowers/*` 是过程文档，公开仓库保留时应确认是否符合长期维护策略。
+
+## 维护日志更新规则
+
+每次重要维护后，在本文件新增一段记录，至少包含：
+
+- 日期
+- 更新内容
+- 维护影响
+- 验证命令
+- 下一步建议
+
+如果改动涉及用户可见功能，同步更新 `CHANGELOG.md`。
+
+如果改动涉及启动方式、项目结构、API 或维护入口，同步更新 `README.md`。

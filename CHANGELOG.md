@@ -5,6 +5,8 @@
 ### Added
 
 - Added `docs/maintenance-guide.md` with maintenance paths, content update checklist, test ownership, build artifact guidance, and GitHub release checklist.
+- Added `docs/project-closeout.md` with project status, delivery contents, verification record, GitHub status, and next priorities.
+- Added `docs/maintenance-log.md` with path ownership, recent update records, next maintenance tasks, and risk notes.
 - Added `src/state/workspaceState.js` to centralize workspace defaults and bootstrap payload mapping.
 - Added `src/hooks/useWorkspaceController.js` to own workspace state and focused workspace mutators.
 - Added `src/actions/workflowActions.js` to isolate generate, workflow, topic refresh, and distribution scheduling actions.
@@ -14,6 +16,7 @@
 
 - Updated `README.md` with current module responsibilities, maintenance entry points, and verification commands.
 - Updated `docs/system-architecture.md` with the current frontend state/action split, server responsibilities, and next refactor boundaries.
+- Updated `docs/maintenance-guide.md` with the public GitHub repository location and branch tracking status.
 - Moved Studio asset mode options from static mock imports to workspace payload-driven props.
 - Refactored `App.jsx` so it focuses more on layout, bootstrap, task detail loading, and artifact routing.
 - Updated `server/state-store.mjs` with `createStateStore(stateFile)` for isolated tests while preserving default local API persistence.

@@ -23,6 +23,8 @@
 - `DESIGN.md`: 当前 UI 视觉规则、组件状态和响应式基准
 - `docs/system-architecture.md`: 系统分层和后续落地路线
 - `docs/maintenance-guide.md`: 维护路径、更新流程和 GitHub 发布检查清单
+- `docs/project-closeout.md`: 项目收尾状态、交付内容、验证记录和后续路线
+- `docs/maintenance-log.md`: 维护路径日志、近期更新记录和下一轮维护优先级
 - `legacy/`: 第一版纯静态原型保留
 
 ## 当前包含
@@ -132,7 +134,13 @@ npm run reset:api-state
 
 ## 维护说明
 
-维护入口见 `docs/maintenance-guide.md`。常见更新路径：
+维护入口：
+
+- `docs/maintenance-guide.md`: 查具体维护路径和更新流程
+- `docs/project-closeout.md`: 查当前交付状态、验证记录和未完成事项
+- `docs/maintenance-log.md`: 查维护日志、路径变更和下一轮优先级
+
+常见更新路径：
 
 - 调整页面布局和视图编排：`src/App.jsx`
 - 调整工作区默认值和 bootstrap 映射：`src/state/workspaceState.js`

@@ -1,5 +1,4 @@
 import { URL } from "node:url";
-import { HOST, PORT } from "./config.mjs";
 import {
   addJobNote,
   applyJobAction,
@@ -18,6 +17,8 @@ import {
 import { ApiError, readBody, sendError, sendJson } from "./http.mjs";
 import { readState, updateState } from "./state-store.mjs";
 
+const ROUTER_URL_BASE = "http://localhost";
+
 function findTopic(state, scenarioKey, topicId) {
   return getTopicsForScenario(state, scenarioKey).find((item) => item.id === topicId) ?? null;
 }
@@ -33,7 +34,7 @@ export async function handleRequest(request, response) {
     return;
   }
 
-  const url = new URL(request.url, `http://${HOST}:${PORT}`);
+  const url = new URL(request.url, ROUTER_URL_BASE);
 
   try {
     if (request.method === "GET" && url.pathname === "/api/health") {

@@ -1,7 +1,33 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { Readable } from "node:stream";
-import { handleRequest } from "../../server/router.mjs";
+
+let handleRequestModule;
+
+async function loadHandleRequest(env = {}) {
+  if (!handleRequestModule) {
+    const previousEnv = {
+      GEO_PULSE_API_HOST: process.env.GEO_PULSE_API_HOST,
+      GEO_PULSE_API_PORT: process.env.GEO_PULSE_API_PORT,
+    };
+
+    Object.assign(process.env, env);
+
+    try {
+      handleRequestModule = await import(`../../server/router.mjs?case=${Date.now()}-${Math.random()}`);
+    } finally {
+      for (const [key, value] of Object.entries(previousEnv)) {
+        if (value === undefined) {
+          delete process.env[key];
+        } else {
+          process.env[key] = value;
+        }
+      }
+    }
+  }
+
+  return handleRequestModule.handleRequest;
+}
 
 function createRequest({ method = "GET", url = "/", body } = {}) {
   const request = Readable.from(body ? [Buffer.from(JSON.stringify(body))] : []);
@@ -28,6 +54,7 @@ function createResponse() {
 async function dispatch(options) {
   const request = createRequest(options);
   const response = createResponse();
+  const handleRequest = await loadHandleRequest(options?.env);
 
   await handleRequest(request, response);
 
@@ -36,6 +63,19 @@ async function dispatch(options) {
     body: response.payload ? JSON.parse(response.payload) : null,
   };
 }
+
+test("router parses relative URLs independently of the API bind host", async () => {
+  const response = await dispatch({
+    method: "GET",
+    url: "/api/health",
+    env: {
+      GEO_PULSE_API_HOST: "::1",
+    },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.body.status, "ok");
+});
 
 test("bootstrap rejects unknown scenario keys", async () => {
   const response = await dispatch({

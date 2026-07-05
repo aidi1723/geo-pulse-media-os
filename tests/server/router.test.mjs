@@ -72,6 +72,58 @@ test("router parses relative URLs independently of the API bind host", async () 
   assert.equal(response.body.status, "ok");
 });
 
+test("health endpoint returns production metadata", async () => {
+  const response = await dispatch({
+    method: "GET",
+    url: "/api/health",
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.body.status, "ok");
+  assert.equal(response.body.service, "geo-pulse-api");
+  assert.equal(response.body.version, "0.1.0");
+  assert.equal(response.body.state, "ready");
+  assert.match(response.body.date, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test("readiness endpoint confirms state storage is readable", async () => {
+  const response = await dispatch({
+    method: "GET",
+    url: "/api/readiness",
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.body.status, "ready");
+  assert.equal(response.body.service, "geo-pulse-api");
+  assert.equal(response.body.state.readable, true);
+  assert.match(response.body.date, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test("readiness endpoint reports state storage failures", async () => {
+  const request = createRequest({
+    method: "GET",
+    url: "/api/readiness",
+  });
+  const response = createResponse();
+  const handleRequest = await loadHandleRequest();
+
+  await handleRequest(request, response, {
+    stateStore: {
+      async checkReadiness() {
+        throw new Error("invalid state json");
+      },
+    },
+  });
+
+  const body = JSON.parse(response.payload);
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(body.status, "not_ready");
+  assert.equal(body.service, "geo-pulse-api");
+  assert.equal(body.state.readable, false);
+  assert.equal(body.state.error, "invalid state json");
+});
+
 test("bootstrap rejects unknown scenario keys", async () => {
   const response = await dispatch({
     method: "GET",

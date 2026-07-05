@@ -1,4 +1,5 @@
 import { URL } from "node:url";
+import packageJson from "../package.json" with { type: "json" };
 import {
   addJobNote,
   applyJobAction,
@@ -15,7 +16,7 @@ import {
   getTopicsForScenario,
 } from "./domain.mjs";
 import { ApiError, readBody, sendError, sendJson } from "./http.mjs";
-import { readState, updateState } from "./state-store.mjs";
+import * as defaultStateStore from "./state-store.mjs";
 
 const ROUTER_URL_BASE = "http://localhost";
 
@@ -23,7 +24,9 @@ function findTopic(state, scenarioKey, topicId) {
   return getTopicsForScenario(state, scenarioKey).find((item) => item.id === topicId) ?? null;
 }
 
-export async function handleRequest(request, response) {
+export async function handleRequest(request, response, dependencies = {}) {
+  const stateStore = dependencies.stateStore ?? defaultStateStore;
+
   if (!request.url) {
     sendError(response, 404, "Not found");
     return;
@@ -42,7 +45,34 @@ export async function handleRequest(request, response) {
         status: "ok",
         date: new Date().toISOString(),
         service: "geo-pulse-api",
+        version: packageJson.version,
+        state: "ready",
       });
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/readiness") {
+      try {
+        const state = await stateStore.checkReadiness();
+        sendJson(response, 200, {
+          status: "ready",
+          date: new Date().toISOString(),
+          service: "geo-pulse-api",
+          version: packageJson.version,
+          state,
+        });
+      } catch (error) {
+        sendJson(response, 503, {
+          status: "not_ready",
+          date: new Date().toISOString(),
+          service: "geo-pulse-api",
+          version: packageJson.version,
+          state: {
+            readable: false,
+            error: error instanceof Error ? error.message : "Unknown readiness error",
+          },
+        });
+      }
       return;
     }
 
@@ -51,19 +81,19 @@ export async function handleRequest(request, response) {
       const scenarioKey = rawScenarioKey
         ? getScenarioByKey(rawScenarioKey, { strict: true }).key
         : getScenarioByKey().key;
-      const state = await readState();
+      const state = await stateStore.readState();
       sendJson(response, 200, createBootstrapPayload(state, scenarioKey));
       return;
     }
 
     if (request.method === "GET" && url.pathname === "/api/jobs") {
-      const state = await readState();
+      const state = await stateStore.readState();
       sendJson(response, 200, buildJobBuckets(state));
       return;
     }
 
     if (request.method === "GET" && url.pathname.startsWith("/api/jobs/")) {
-      const state = await readState();
+      const state = await stateStore.readState();
       const jobId = url.pathname.replace("/api/jobs/", "");
       const job = getJobById(state, jobId);
 
@@ -79,7 +109,7 @@ export async function handleRequest(request, response) {
     if (request.method === "POST" && url.pathname === "/api/scenario") {
       const body = await readBody(request);
       const scenario = getScenarioByKey(body.scenarioKey, { strict: true });
-      const state = await readState();
+      const state = await stateStore.readState();
       const topics = getTopicsForScenario(state, scenario.key);
       sendJson(response, 200, {
         scenario,
@@ -94,7 +124,7 @@ export async function handleRequest(request, response) {
     if (request.method === "POST" && url.pathname === "/api/topics/refresh") {
       const body = await readBody(request);
       const scenario = getScenarioByKey(body.scenarioKey, { strict: true });
-      const result = await updateState((state) => {
+      const result = await stateStore.updateState((state) => {
         const { topics, job } = createTopicRefreshJob(state, scenario.key);
         return {
           topics,
@@ -115,7 +145,9 @@ export async function handleRequest(request, response) {
     if (request.method === "POST" && url.pathname === "/api/workflow") {
       const body = await readBody(request);
       const scenario = getScenarioByKey(body.scenarioKey, { strict: true });
-      const result = await updateState((state) => createWorkflowBundle(state, scenario.key));
+      const result = await stateStore.updateState((state) =>
+        createWorkflowBundle(state, scenario.key),
+      );
 
       sendJson(response, 200, {
         banner: `已启动 ${scenario.name} 场景工作流：采集热点 -> 评分选题 -> 生成图文/视频 -> 分发到目标渠道。`,
@@ -129,7 +161,7 @@ export async function handleRequest(request, response) {
     if (request.method === "POST" && url.pathname === "/api/generate") {
       const body = await readBody(request);
       const scenario = getScenarioByKey(body.scenarioKey, { strict: true });
-      const result = await updateState((state) => {
+      const result = await stateStore.updateState((state) => {
         const topic = findTopic(state, scenario.key, body.topicId);
         const topicText = ensureGenerationInput({ topic, topicText: body.topicText });
         const { draft, job } = createGenerationJob(state, {
@@ -153,7 +185,7 @@ export async function handleRequest(request, response) {
     if (request.method === "POST" && url.pathname === "/api/distribution/schedule") {
       const body = await readBody(request);
       const scenario = getScenarioByKey(body.scenarioKey, { strict: true });
-      const result = await updateState((state) => {
+      const result = await stateStore.updateState((state) => {
         const { job } = createDistributionJob(state, scenario.key);
         return {
           job,
@@ -181,7 +213,7 @@ export async function handleRequest(request, response) {
       }
 
       if (actionSegment === "action") {
-        const result = await updateState((state) => {
+        const result = await stateStore.updateState((state) => {
           const job = applyJobAction(state, jobId, body.action, body.note ?? "");
 
           if (!job) {
@@ -203,7 +235,7 @@ export async function handleRequest(request, response) {
       }
 
       if (actionSegment === "note") {
-        const result = await updateState((state) => {
+        const result = await stateStore.updateState((state) => {
           const job = addJobNote(state, jobId, body.note ?? "");
 
           if (!job) {

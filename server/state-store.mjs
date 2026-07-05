@@ -50,9 +50,17 @@ export function createStateStore(stateFile = STATE_FILE) {
     return nextRun;
   }
 
+  async function checkReadiness() {
+    await readState();
+    return {
+      readable: true,
+    };
+  }
+
   return {
     readState,
     updateState,
+    checkReadiness,
   };
 }
 
@@ -60,3 +68,4 @@ const defaultStore = createStateStore();
 
 export const readState = defaultStore.readState;
 export const updateState = defaultStore.updateState;
+export const checkReadiness = defaultStore.checkReadiness;

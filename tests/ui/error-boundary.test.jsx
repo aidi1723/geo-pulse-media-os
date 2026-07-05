@@ -58,6 +58,8 @@ test("ErrorBoundary renders a production fallback for render failures", async ()
 
     assert.match(container.textContent, /工作台暂时无法渲染/);
     assert.match(container.textContent, /请刷新页面或查看运行日志/);
+    assert.ok(container.querySelector('main[role="alert"]'));
+    assert.match(container.querySelector("h1").textContent, /工作台暂时无法渲染/);
   } finally {
     console.error = originalConsoleError;
     await act(async () => {

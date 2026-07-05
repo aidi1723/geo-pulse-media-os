@@ -28,10 +28,11 @@
 - Updated runtime API configuration so the frontend can use `VITE_API_BASE_URL` and the local server can be overridden with `GEO_PULSE_API_HOST`, `GEO_PULSE_API_PORT`, and `GEO_PULSE_STATE_FILE`.
 - Updated `README.md` with current module responsibilities, maintenance entry points, and verification commands.
 - Updated `README.md` with CI, environment configuration, health/readiness endpoints, request logging, error boundary behavior, and operations documentation links.
-- Updated `docs/system-architecture.md` with the current frontend state/action split, server responsibilities, and next refactor boundaries.
+- Updated `docs/system-architecture.md` with the current frontend state/action split, server responsibilities, job state machine boundary, and next refactor priorities.
+- Updated `docs/project-closeout.md` and `docs/maintenance-guide.md` with the final maintenance paths, verification count, and remaining productionization priorities.
 - Updated `docs/maintenance-guide.md` with the public GitHub repository location and branch tracking status.
 - Moved Studio asset mode options from static mock imports to workspace payload-driven props.
-- Refactored `App.jsx` so it focuses more on layout, bootstrap, task detail loading, and artifact routing.
+- Refactored `App.jsx` so it focuses more on layout, bootstrap, task detail loading, and page composition.
 - Refactored `App.jsx` to delegate job mutation and artifact routing behavior to focused action modules.
 - Refactored `server/domain.mjs` to delegate task action transitions to the focused job state machine.
 - Updated `server/state-store.mjs` with `createStateStore(stateFile)` for isolated tests while preserving default local API persistence.

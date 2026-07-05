@@ -27,9 +27,8 @@ Use this file for:
 - Bootstrap flow from local API
 - Scenario switching
 - Job detail loading
-- Returning from a job artifact to the right workspace section
 
-Do not add large data-mapping or API mutation logic here. Put reusable workspace state rules in `src/state/`, controller logic in `src/hooks/`, and async workflow mutations in `src/actions/`.
+Do not add large data-mapping, API mutation, or artifact-routing logic here. Put reusable workspace state rules in `src/state/`, controller logic in `src/hooks/`, async workflow mutations in `src/actions/`, and job artifact routing in `src/actions/artifactRouting.js`.
 
 ### Workspace State
 
@@ -59,14 +58,31 @@ Then add or update `tests/src/workspace-state.test.mjs` and `tests/ui/workspace-
 
 ### Workflow Actions
 
-Path: `src/actions/workflowActions.js`
+Paths:
 
-Use this file for async workflow actions that combine an API call with workspace/UI updates:
+- `src/actions/workflowActions.js`
+- `src/actions/jobActions.js`
+- `src/actions/artifactRouting.js`
+
+Use `src/actions/workflowActions.js` for async workflow actions that combine an API call with workspace/UI updates:
 
 - Generate draft
 - Run daily workflow
 - Refresh topics
 - Schedule distribution
+
+Use `src/actions/jobActions.js` for:
+
+- Saving task notes
+- Running approve/reject/retry/cancel actions
+- Updating selected job, job buckets, banners, note draft, busy state, highlights, and app error
+
+Use `src/actions/artifactRouting.js` for:
+
+- Opening copy draft artifacts in Studio
+- Opening distribution plans in Distribution
+- Opening topic refresh artifacts in Discovery
+- Loading cross-scenario context before routing when needed
 
 These actions receive dependencies through parameters. Keep that pattern so behavior can be tested without real network calls.
 
@@ -139,8 +155,14 @@ Use `server/domain.mjs` for local API domain behavior:
 
 - Draft composition
 - Job creation
-- Job action rules
 - Bootstrap payload construction
+
+Use `server/job-state-machine.mjs` for local task action transition rules:
+
+- Available approve/reject/retry/cancel actions
+- Status and review status transitions
+- Retry timestamps and retry counts
+- Cancel and invalid-action behavior
 
 Use `server/router.mjs` for HTTP endpoint routing only.
 

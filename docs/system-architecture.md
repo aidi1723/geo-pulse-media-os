@@ -122,19 +122,22 @@ type PublishJob = {
 
 ## 当前仓库对应关系
 
-- `src/App.jsx`: 应用外壳、视图切换、启动加载、任务详情和回到工作区的页面编排
+- `src/App.jsx`: 应用外壳、视图切换、启动加载、任务详情和页面编排
 - `src/state/workspaceState.js`: 工作区默认状态和 bootstrap payload 映射
 - `src/hooks/useWorkspaceController.js`: React 工作区状态控制器
 - `src/actions/workflowActions.js`: 生成、工作流、选题刷新、分发排期等异步动作
+- `src/actions/jobActions.js`: 任务备注保存和审核动作
+- `src/actions/artifactRouting.js`: 从任务产物回到对应工作区视图的路由规则
 - `src/services/orchestrator.js`: 前端访问本地 API 的请求层，未来可替换成真实编排 API
 - `src/data/mockData.js`: 演示场景、选题、平台、指标和安全数据
 - `src/sections/*`: 每个运营域对应一个独立视图，只接收 props 和回调
 - `src/components/*`: 任务栏、导航、状态和指标等复用组件
-- `server/domain.mjs`: 本地 API 的领域逻辑，包括草稿生成、任务创建和任务动作校验
+- `server/domain.mjs`: 本地 API 的领域逻辑，包括草稿生成、任务创建和状态持久化编排
+- `server/job-state-machine.mjs`: 任务 approve/reject/retry/cancel 的可用动作和状态转换规则
 - `server/router.mjs`: 本地 API 的 HTTP 路由分发
 - `server/state-store.mjs`: JSON 状态持久化，支持默认状态文件和测试隔离状态文件
 - `tests/server/*`: API 边界、领域规则和状态存储测试
-- `tests/src/*`: 工具函数、状态映射和 workflow action 测试
+- `tests/src/*`: 工具函数、状态映射、action 和 orchestrator contract 测试
 - `tests/ui/*`: React 组件、hook 和用户工作流测试
 - `docs/maintenance-guide.md`: 维护路径、更新流程和 GitHub 发布检查清单
 - `docs/project-closeout.md`: 项目收尾交接、验证记录和后续路线
@@ -148,10 +151,18 @@ type PublishJob = {
 - `App.jsx` 不再直接承载全部工作区状态字段，工作区状态已集中到 `useWorkspaceController`。
 - bootstrap payload 和 fallback 映射已集中到 `workspaceState`。
 - 生成、工作流、刷新选题和创建分发任务已集中到 `workflowActions`，通过依赖注入测试。
+- 任务备注和任务动作已集中到 `jobActions`，通过依赖注入测试。
+- 从任务产物回到工作区的路由已集中到 `artifactRouting`。
+- 前端 orchestrator 请求路径、方法、请求体、headers 和错误抛出已通过 contract tests 锁定。
 - `StudioSection` 的素材模式来自工作区 payload，不再直接依赖静态 mock 数据。
+
+近期已完成的服务端拆分：
+
+- 任务 approve/reject/retry/cancel 的可用动作和状态转换已集中到 `server/job-state-machine.mjs`。
+- `server/domain.mjs` 保留草稿生成、任务创建、备注、历史和持久化编排职责。
 
 后续继续拆分时，优先处理：
 
-- 任务备注和任务动作：从 `App.jsx` 下沉到独立 job action 模块。
-- 从任务产物回到工作区：把 `handleOpenWorkspaceFromJob` 拆成可测试的 artifact routing 规则。
 - API schema 和真实服务边界：为 `orchestrator` 请求层补类型化契约或 schema 校验。
+- 生产持久化、鉴权隔离和无副作用 readiness。
+- 真实队列或 worker 边界：让任务状态机承接异步执行事件。

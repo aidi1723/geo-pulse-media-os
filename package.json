@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:api": "node server/mock-api.mjs",
     "reset:api-state": "node server/reset-state.mjs",
-    "test": "node --test tests/server/domain.test.mjs tests/server/errors.test.mjs tests/server/router.test.mjs tests/server/state-store.test.mjs tests/src/runtime-config.test.mjs tests/src/generation-utils.test.mjs tests/src/workflow-actions.test.mjs tests/src/workspace-state.test.mjs tests/src/workspace-utils.test.mjs tests/src/jobs-utils.test.mjs && node --import tsx --test tests/ui/task-board.test.jsx tests/ui/section-loading.test.jsx tests/ui/workspace-controller.test.jsx tests/ui/app-workflow.test.jsx",
+    "test": "node --test tests/server/domain.test.mjs tests/server/errors.test.mjs tests/server/router.test.mjs tests/server/state-store.test.mjs tests/src/runtime-config.test.mjs tests/src/orchestrator.test.mjs tests/src/generation-utils.test.mjs tests/src/workflow-actions.test.mjs tests/src/workspace-state.test.mjs tests/src/workspace-utils.test.mjs tests/src/jobs-utils.test.mjs && node --import tsx --test tests/ui/task-board.test.jsx tests/ui/section-loading.test.jsx tests/ui/workspace-controller.test.jsx tests/ui/app-workflow.test.jsx",
     "build": "vite build",
     "preview": "vite preview"
   },

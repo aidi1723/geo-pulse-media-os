@@ -4,3 +4,13 @@ dist
 .playwright-cli
 output
 Gemini_Generated_Image*.png
+
+# Local environment and secret material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt

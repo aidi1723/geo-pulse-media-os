@@ -28,6 +28,30 @@
 
 ## 最近更新记录
 
+### 2026-07-05: 公开仓库隐私信息清理
+
+更新内容：
+
+- 检查公开仓库文件、Git 历史和未跟踪 `open-source/` 目录，未发现真实密钥、`.env`、私钥文件或绝对本地路径被跟踪。
+- 将当前仓库后续提交作者配置为 GitHub noreply 身份：`aidi1723 <223056196+aidi1723@users.noreply.github.com>`。
+- 更新 `.gitignore`，忽略 `.env`、`.env.*`、私钥和证书文件，同时保留 `.env.example` 可跟踪。
+- 重写 `main` 分支全部历史提交的 author/committer，清除旧本机邮箱和本机名痕迹。
+- 使用 `git push --force-with-lease origin main` 更新公开仓库历史。
+- 清理本地临时旧历史引用、reflog 和不可达对象，降低旧作者信息被误推送回远端的风险。
+
+维护影响：
+
+- 远端 `main` 历史提交 SHA 已改变，协作者需要重新同步本地分支，避免把旧历史再次推回公开仓库。
+- 后续提交会默认使用 GitHub noreply 邮箱，不再暴露本机局域网邮箱。
+- 新增敏感文件忽略规则后，本地真实环境变量和密钥文件不应提交到仓库；如确需提供配置模板，只维护 `.env.example`。
+
+验证：
+
+- `git log --all --format='%an <%ae> | %cn <%ce>' | sort -u`
+- `git log --all --format='%ae%n%ce' | rg 'aidideMac-mini|aidi@aidideMac-mini\.lan'`
+- `git grep -n -I -E '(aidideMac-mini|aidi@aidideMac-mini\.lan)' origin/main`
+- `git ls-remote origin refs/heads/main` 返回 `4d69e559838660df0b9409cb5dcc608a389ef5a1`
+
 ### 2026-07-05: 任务状态机拆分
 
 更新内容：

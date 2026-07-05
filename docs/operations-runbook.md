@@ -28,7 +28,7 @@ npm run dev
 
 ## Environment Variables
 
-- `VITE_API_BASE_URL`: Frontend API base URL. Leave empty to preserve relative `/api` requests through the Vite proxy/local runtime.
+- `VITE_API_BASE_URL`: Frontend API base URL. Leave empty to preserve relative `/api` requests through the default Vite proxy target at `127.0.0.1:8787`.
 - `GEO_PULSE_API_HOST`: Local API bind host. Defaults to `127.0.0.1`.
 - `GEO_PULSE_API_PORT`: Local API port. Defaults to `8787`.
 - `GEO_PULSE_STATE_FILE`: JSON state file used by the local mock API. Defaults to `server/data/state.json`.

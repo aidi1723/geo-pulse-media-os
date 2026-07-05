@@ -133,7 +133,7 @@ npm run reset:api-state
 ## 生产工程基础
 
 - CI：`.github/workflows/ci.yml` 在 push/PR 到 `main` 时使用 Node 22 执行 `npm ci`、`npm test` 和 `npm run build`。
-- 前端配置：`VITE_API_BASE_URL` 控制 API base URL，留空时保持相对 `/api` 请求和本地 Vite proxy 行为。
+- 前端配置：`VITE_API_BASE_URL` 控制 API base URL，留空时保持相对 `/api` 请求和默认 `127.0.0.1:8787` 的本地 Vite proxy 行为。
 - API 配置：`GEO_PULSE_API_HOST`、`GEO_PULSE_API_PORT`、`GEO_PULSE_STATE_FILE` 分别控制本地 API 监听地址、端口和 JSON 状态文件路径。
 - 健康检查：`GET /api/health` 返回服务健康和元数据，`GET /api/readiness` 检查本地状态存储可读性。
 - 请求日志：本地 API 记录 method、path、status、duration，不记录 query 内容和 request body。

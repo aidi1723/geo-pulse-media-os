@@ -235,6 +235,34 @@ test("distribution plan with missing channels routes to distribution with empty 
   ]);
 });
 
+test("distribution plan with non-array channels routes to distribution with empty highlights", async () => {
+  const recorder = createRecorder();
+
+  await openWorkspaceFromJob({
+    selectedJob: {
+      label: "分发排期",
+      scenarioKey: "consumer-tech",
+      artifact: {
+        type: "distribution_plan",
+        channels: "小红书",
+      },
+    },
+    scenarioKey: "consumer-tech",
+    topics: baseTopics,
+    services: recorder.services,
+    workspace: recorder.workspace,
+    ui: recorder.ui,
+  });
+
+  assert.deepEqual(recorder.calls, [
+    ["busy", "open-workspace"],
+    ["view", "distribution"],
+    ["highlighted", []],
+    ["banner", "已从任务“分发排期”定位到对应分发排期。"],
+    ["busy", ""],
+  ]);
+});
+
 test("topic refresh routes to discovery and clears highlights", async () => {
   const recorder = createRecorder();
 

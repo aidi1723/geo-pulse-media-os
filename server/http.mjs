@@ -22,7 +22,32 @@ export function toErrorResponse(error, fallbackStatusCode = 500) {
   };
 }
 
+function getLogPath(request) {
+  try {
+    return new URL(request.url ?? "/", "http://localhost").pathname;
+  } catch {
+    return request.url ?? "/";
+  }
+}
+
+export function withRequestLogging(handler, { logger = console, now = Date.now } = {}) {
+  return async function loggedHandler(request, response) {
+    const startedAt = now();
+
+    try {
+      await handler(request, response);
+    } finally {
+      const durationMs = Math.max(0, now() - startedAt);
+      const method = request.method ?? "UNKNOWN";
+      const path = getLogPath(request);
+      const statusCode = response.statusCode || 500;
+      logger.info(`${method} ${path} ${statusCode} ${durationMs}ms`);
+    }
+  };
+}
+
 export function sendJson(response, statusCode, payload) {
+  response.statusCode = statusCode;
   response.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",

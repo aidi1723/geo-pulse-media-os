@@ -16,6 +16,9 @@
 - Added `src/state/workspaceState.js` to centralize workspace defaults and bootstrap payload mapping.
 - Added `src/hooks/useWorkspaceController.js` to own workspace state and focused workspace mutators.
 - Added `src/actions/workflowActions.js` to isolate generate, workflow, topic refresh, and distribution scheduling actions.
+- Added `src/actions/jobActions.js` for task note and review action behavior.
+- Added `src/actions/artifactRouting.js` for task artifact-to-workspace routing.
+- Added orchestrator contract coverage for request paths, methods, bodies, and error throwing.
 - Added regression coverage for workspace state mapping, workspace controller behavior, workflow actions, and state-store isolation.
 
 ### Changed
@@ -27,12 +30,13 @@
 - Updated `docs/maintenance-guide.md` with the public GitHub repository location and branch tracking status.
 - Moved Studio asset mode options from static mock imports to workspace payload-driven props.
 - Refactored `App.jsx` so it focuses more on layout, bootstrap, task detail loading, and artifact routing.
+- Refactored `App.jsx` to delegate job mutation and artifact routing behavior to focused action modules.
 - Updated `server/state-store.mjs` with `createStateStore(stateFile)` for isolated tests while preserving default local API persistence.
 - Updated the default `npm test` script to include all new maintenance and refactor regression tests.
 
 ### Verification
 
-- `npm test` — 67 tests passing.
+- `npm test` — 93 tests passing.
 - `npm run build` — Vite production build completed.
 
 ## 2026-05-23

@@ -11,6 +11,8 @@
 
 - `src/App.jsx`: 主工作台布局、视图切换、启动加载和任务详情编排
 - `src/actions/workflowActions.js`: 生成、工作流、选题刷新和分发排期的异步动作
+- `src/actions/jobActions.js`: 任务备注保存和任务审核动作
+- `src/actions/artifactRouting.js`: 从任务产物回到对应工作区视图的路由逻辑
 - `src/components/*`: 任务栏、导航和指标卡等通用组件
 - `src/hooks/useWorkspaceController.js`: 工作区状态控制器
 - `src/sections/*`: 按业务域拆分的页面模块
@@ -20,7 +22,7 @@
 - `.github/workflows/ci.yml`: GitHub Actions CI，push/PR 到 `main` 时运行安装、测试和构建
 - `.env.example`: 前端和本地 API 的环境变量示例
 - `tests/server/*.test.mjs`: 本地 API 和领域行为测试
-- `tests/src/*.test.mjs`: 纯工具、状态映射和 workflow action 测试
+- `tests/src/*.test.mjs`: 纯工具、状态映射、action 和 orchestrator contract 测试
 - `tests/ui/*.test.jsx`: React 组件、hook 和工作流测试
 - `DESIGN.md`: 当前 UI 视觉规则、组件状态和响应式基准
 - `docs/system-architecture.md`: 系统分层和后续落地路线
@@ -163,6 +165,8 @@ npm run reset:api-state
 - 调整工作区默认值和 bootstrap 映射：`src/state/workspaceState.js`
 - 调整工作区 React 状态控制：`src/hooks/useWorkspaceController.js`
 - 调整生成、工作流、刷新、分发等 API 动作：`src/actions/workflowActions.js`
+- 调整任务备注、审核、重试、取消等动作：`src/actions/jobActions.js`
+- 调整任务产物回到工作区的路由：`src/actions/artifactRouting.js`
 - 调整本地 API 行为：`server/domain.mjs` 和 `server/router.mjs`
 - 调整设计风格：先看 `DESIGN.md`，再改 `src/styles.css`
 - 调整演示内容：`src/data/mockData.js` 和 `server/data/state.json`

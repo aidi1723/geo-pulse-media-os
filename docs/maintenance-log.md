@@ -10,11 +10,11 @@
 
 | 维护对象 | 主要路径 | 最近状态 | 下次维护重点 |
 | --- | --- | --- | --- |
-| 应用外壳 | `src/App.jsx` | 已拆出 workspace state 和 workflow actions | 继续拆 job actions 和 artifact routing |
+| 应用外壳 | `src/App.jsx` | 已拆出 workspace state、workflow actions、job actions 和 artifact routing | 继续保持布局编排职责，不重新吸收业务动作 |
 | 工作区状态映射 | `src/state/workspaceState.js` | 已集中 bootstrap 和 fallback 规则 | 新增字段时同步测试 |
 | 工作区状态控制 | `src/hooks/useWorkspaceController.js` | 已封装 workspace state 和 focused setters | 视情况补更细的 controller 动作 |
-| 工作流动作 | `src/actions/workflowActions.js` | 已覆盖生成、工作流、刷新、分发 | 后续加入真实 API 错误分类 |
-| API 请求层 | `src/services/orchestrator.js`, `src/config/runtimeConfig.js` | 支持 `VITE_API_BASE_URL`，留空保持相对 `/api` 行为 | 后续补 schema 或类型契约 |
+| 工作流动作 | `src/actions/workflowActions.js`, `src/actions/jobActions.js`, `src/actions/artifactRouting.js` | 已覆盖生成、工作流、刷新、分发、任务备注/动作和产物路由 | 后续加入真实 API 错误分类和 schema contract |
+| API 请求层 | `src/services/orchestrator.js`, `src/config/runtimeConfig.js` | 支持 `VITE_API_BASE_URL`，并有请求 contract 测试 | 后续补 schema 或类型契约 |
 | UI 区块 | `src/sections/*` | 当前按业务域拆分 | 保持 props 驱动，不直接耦合 mock 数据 |
 | 复用组件 | `src/components/*` | 任务板和详情组件已拆分 | 后续评估任务详情是否继续拆 artifact view |
 | 本地 API 路由 | `server/router.mjs`, `server/http.mjs` | 已有 health/readiness、请求日志和错误响应边界 | 端点增加后考虑路由表或轻量 router |
@@ -23,10 +23,30 @@
 | 演示状态数据 | `server/data/state.json` | 用于本地演示 | 演示前运行 reset 脚本 |
 | 静态演示数据 | `src/data/mockData.js` | 提供场景和 fallback 数据 | 接真实 API 后逐步降级为 demo seed |
 | 样式系统 | `src/styles.css` 和 `DESIGN.md` | 使用全局 CSS tokens，并有应用级 ErrorBoundary 兜底渲染失败 | 组件增多后考虑拆样式分区 |
-| 测试 | `tests/` | 当前 67 个测试，默认 `npm test` 覆盖 server/src/ui | 新模块必须同步加入默认 test script |
+| 测试 | `tests/` | 当前 93 个测试，默认 `npm test` 覆盖 server/src/ui | 新模块必须同步加入默认 test script |
 | 文档 | `README.md`, `CHANGELOG.md`, `docs/*`, `.env.example` | 已补生产工程基础、运维 runbook 和发布 checklist | 每次结构、配置、启动方式或发布流程变更同步更新 |
 
 ## 最近更新记录
+
+### 2026-07-05: 内部稳定性收敛
+
+更新内容：
+
+- 新增 `src/actions/jobActions.js`，集中维护任务备注保存和任务审核动作。
+- 新增 `src/actions/artifactRouting.js`，集中维护任务产物回到 studio/distribution/discovery 的路由逻辑。
+- 扩展 `tests/src/orchestrator.test.mjs`，锁定前端 API 请求路径、方法、请求体和错误抛出行为。
+- `App.jsx` 继续收敛为状态装配和页面编排层。
+
+维护影响：
+
+- 后续任务动作调整优先进入 `jobActions`。
+- 后续产物路由调整优先进入 `artifactRouting`。
+- 接真实 API 前应先更新 orchestrator contract 测试。
+
+验证：
+
+- `npm test`，93 个测试通过。
+- `npm run build`
 
 ### 2026-07-05: 生产工程基础补齐
 
@@ -180,44 +200,7 @@ git push
 
 ## 下次维护建议
 
-### 第一优先级：任务动作拆分
-
-目标：
-
-- 从 `App.jsx` 移出 `handleSaveNote`
-- 从 `App.jsx` 移出 `handleJobAction`
-
-建议新路径：
-
-- `src/actions/jobActions.js`
-- `tests/src/job-actions.test.mjs`
-
-注意点：
-
-- 保持任务动作 busy 状态。
-- 保持备注清空行为。
-- 保持 error banner 逻辑。
-- 不要在 action 内直接引用组件状态，继续使用依赖注入。
-
-### 第二优先级：Artifact Routing 拆分
-
-目标：
-
-- 从 `App.jsx` 移出 `handleOpenWorkspaceFromJob` 的 artifact 判断。
-
-建议新路径：
-
-- `src/actions/artifactRouting.js` 或 `src/state/artifactRouting.js`
-- `tests/src/artifact-routing.test.mjs`
-
-注意点：
-
-- `copy_draft` 要回到 studio。
-- `distribution_plan` 要回到 distribution。
-- `topic_refresh` 要回到 discovery。
-- 跨场景任务要先加载对应 scenario context。
-
-### 第三优先级：生产持久化、鉴权和真实集成规划
+### 第一优先级：生产持久化、鉴权和真实集成规划
 
 目标：
 
@@ -230,6 +213,46 @@ git push
 - `docs/system-architecture.md`
 - `docs/operations-runbook.md`
 - 后续真实服务目录或 API contract 文档
+
+注意点：
+
+- 真实 API 接入前先扩展 `tests/src/orchestrator.test.mjs`。
+- readiness 必须改成无副作用检查。
+- 账号和发布权限不要耦合到内容生成流程。
+
+### 第二优先级：API schema/type contract
+
+目标：
+
+- 为 bootstrap、jobs、generation、distribution 响应定义可验证契约。
+- 避免前端 action 依赖隐式 payload 字段。
+- 为真实后端替换保留兼容测试。
+
+建议新路径：
+
+- `src/services/orchestrator.js`
+- `tests/src/orchestrator.test.mjs`
+- 后续 `docs/api-contract.md` 或 schema 目录
+
+注意点：
+
+- 保持 schema 轻量，不引入重依赖前先评估收益。
+- 先覆盖错误响应和可选字段 fallback。
+- 合约更新必须同步 mock API 测试。
+
+### 第三优先级：任务状态机拆分
+
+目标：
+
+- 从 `server/domain.mjs` 拆出任务状态流转规则。
+- 明确 approve/reject/retry/cancel 在不同状态下的合法转换。
+- 为真实队列或 worker 接入保留边界。
+
+建议新路径：
+
+- `server/job-state-machine.mjs`
+- `tests/server/job-state-machine.test.mjs`
+- `server/domain.mjs`
 
 ## 风险记录
 
